@@ -34,7 +34,7 @@ install.packages(c("shiny", "plotly", "data.table", "dplyr", "shinyjs", "readxl"
 ```
 
 ## Usage
-Use the `Load data file` button to load your data file. It can be `.txt` `.csv` `.tsv` or the first sheet of `.xslx`.
+Use the `Load data file` button to load your data file. It can be `.txt` `.csv` `.tsv` or `.xslx` (first sheet only).
 
 1. First column must be your gene name or other identifier
 2. Second column must be your fold change or other effect size
