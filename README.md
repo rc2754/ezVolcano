@@ -40,6 +40,8 @@ Use the `Load data file` button to load your data file. It can be `.txt` `.csv` 
 2. Second column must be your fold change or other effect size
 3. Third column must be your p-value or other statistical significance value
 
+Additional columns are ignored.
+
 Use the `Save plot` button to save all of your datapoints, labels, and aesthetic settings. 
 
 Use the `Save configuration` button to save only your aesthetic settings. 
