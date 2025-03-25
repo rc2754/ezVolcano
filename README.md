@@ -33,9 +33,9 @@ install.packages(c("shiny", "plotly", "data.table", "dplyr", "shinyjs", "readxl"
 
 ## Usage
 ## Authors
-The ezVolcano project was developed by Richard Chen in the Proteomics Core Facility at Brown University.
+The `ezVolcano` project was developed by Richard Chen in the Proteomics Core Facility at Brown University.
 
-ezVolcano uses source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
+`ezVolcano` uses source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
 
 ## Contact
 
