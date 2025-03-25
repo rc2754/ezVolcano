@@ -27,9 +27,9 @@ Change `setwd` to wherever you placed the scripts.
 
 ## Usage
 ## Authors
-This project was developed by Richard Chen in the Proteomics Core Facility at Brown University.
+The ezVolcano project was developed by Richard Chen in the Proteomics Core Facility at Brown University.
 
-Source code from the `easylabel` R package developed by Myles Lewis (https://github.com/myles-lewis/easylabel) was used for interactive labels in ezVolcano.
+ezVolcano uses source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
 
 ## Contact
 
