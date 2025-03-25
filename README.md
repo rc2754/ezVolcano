@@ -25,6 +25,12 @@ runApp()
 ```
 Change `setwd` to wherever you placed the scripts.
 
+You'll need these R packages installed:
+
+```bash
+install.packages(c("shiny", "plotly", "data.table", "dplyr", "shinyjs", "readxl"))
+```
+
 ## Usage
 ## Authors
 The ezVolcano project was developed by Richard Chen in the Proteomics Core Facility at Brown University.
