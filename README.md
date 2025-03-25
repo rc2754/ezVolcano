@@ -6,7 +6,6 @@ Use the camera button on the Plotly toolbar to export as .PNG file.
 Online version is available here: 
 
 ## Table of Contents
-
 - [Local setup](#local-setup)
 - [Usage](#usage)
 - [Authors](#authors)
@@ -14,7 +13,6 @@ Online version is available here:
 - [License](#license)
 
 ## Local setup
-
 In addition to the online version, you can download the scripts and run them locally through RStudio. 
 
 1. Download `server.R` and `ui.R` and place these scripts in a folder
@@ -29,7 +27,13 @@ Change `setwd` to wherever you placed the scripts.
 
 ## Usage
 ## Authors
+This project was developed by Richard Chen in the Proteomics Core Facility at Brown University.
+
+Source code from the `easylabel` R package developed by Myles Lewis (https://github.com/myles-lewis/easylabel) was used for interactive labels in ezVolcano.
+
 ## Contact
+
+
 ## License
 
 
