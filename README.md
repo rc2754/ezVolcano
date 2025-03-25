@@ -34,6 +34,18 @@ install.packages(c("shiny", "plotly", "data.table", "dplyr", "shinyjs", "readxl"
 ```
 
 ## Usage
+Use the `Load data file` button to load your data file. It can be `.txt` `.csv` `.tsv` or the first sheet of `.xslx`.
+
+1. First column must be your gene name or other identifier
+2. Second column must be your fold change or other effect size
+3. Third column must be your p-value or other statistical significance value
+
+Use the `Save plot` button to save all of your datapoints, labels, and aesthetic settings. 
+
+Use the `Save configuration` button to save only your aesthetic settings. 
+
+Example files are available for download in the app.
+
 ## Authors
 The `ezVolcano` project was developed by Richard Chen in the Proteomics Core Facility at Brown University.
 
