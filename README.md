@@ -54,7 +54,7 @@ Example files are available for download in the app.
 `ezVolcano` uses source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
 
 ## Contact
-Feel free to open an issue on Github or contact `richard_chen1@brown.edu` with any questions.
+Open an issue on Github or contact `richard_chen1@brown.edu` with any questions.
 
 ## License
 `The MIT License (MIT)`
