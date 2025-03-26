@@ -31,16 +31,16 @@ ui <- fluidPage(
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
                    column(12, fileInput("load_config", "Load config file", accept = c(".rds"))),
                    column(12, downloadButton("save_config", "Save configuration")),
-
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
+				   
                    column(12, selectizeInput('label', 'Select labels', choices = NULL, options = list(onInitialize = I('function() { this.setValue(""); }')), multiple = TRUE)),
                    column(6, textInput("prefix", "Save file prefix", value = "")),
                    column(6, textInput("suffix", "Save file suffix", value = "")),
                    column(6, actionButton("add_batch", "Add batch labels")),
                    column(6, actionButton("clear_label", "Clear labels")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
+				   
                    column(12, textInput("plot_title", "Plot title", value = "")),
-
                    column(6, textInput("x_label", "x-axis label", value = "")),
                    column(6, textInput("y_label", "y-axis label", value = "-log<sub>10</sub>(P.adj)")),
                    column(6, checkboxInput("use_zscore", "Use Z-score", TRUE)),
@@ -191,7 +191,6 @@ ui <- fluidPage(
                  ),
                  width = 3
                ),
-
                tagAppendAttributes(mainPanel(class = "sticky",
                                              plotlyOutput('plot'),)
                )
@@ -256,28 +255,28 @@ ui <- fluidPage(
 
     tabPanel("Credits",
              fluidPage(
-               h3("About EzVolcano"),
-               p("The EzVolcano Shiny R app is a tool for charting volcano plots. You can click on datapoints to add labels and drag these labels around."),
+               h3("About ezVolcano"),
+               p("The ezVolcano Shiny R app is a tool for charting volcano plots. You can click on datapoints to add labels and drag these labels around."),
 
                br(),
                h4("Contact"),
-               p("EzVolcano is created and maintained by Richard Chen. For bug reports and feature requests, feel free to contact through:"),
+               p("ezVolcano is created and maintained by Richard Chen. For bug reports and feature requests, feel free to contact through:"),
 
                tags$ul(
-                 tags$li(a(href = "https://github.com/yourgithub", "Github")),
-                 tags$li("Email: Richard_chen1@brown.edu")
+                 tags$li(a(href = "https://github.com/chenr47/ezVolcano/issues", "https://github.com/chenr47/ezVolcano/issues")),
+                 tags$li("richard_chen1@brown.edu")
                ),
 
                br(),
                h4("Source"),
                p("Source code is available at: ",
-                 a(href = "https://github.com/yourgithub/EzVolcano", "EzVolcano GitHub Repository")  # Clickable link right after the text
+                 a(href = "https://github.com/chenr47/ezVolcano", "https://github.com/chenr47/ezVolcano") 
                ),
-               p("EzVolcano is very easy to set up locally (see the GitHub tutorial), and this is strongly recommended as currently the active hours hosted by shinyapps.io are limited."),
+               p("ezVolcano is very easy to set up locally (see the GitHub tutorial), and this is strongly recommended as currently the active hours hosted by shinyapps.io are limited."),
 
                br(),
                h4("Credits"),
-               p("The source code from the easylabel R package by Myles Lewis was used to enable interactive annotation labels and the save system for them. This package served as inspiration for creating EzVolcano, with a focus on making the tool easy to use and accessible to the broader scientific community.")
+               p("The source code from the easylabel R package by Myles Lewis was used to enable interactive annotation labels and the save system for them. This package served as inspiration for creating ezVolcano, with a focus on making the tool easy to use and accessible to the broader scientific community.")
              )
     )
   )
