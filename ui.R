@@ -201,7 +201,7 @@ ui <- fluidPage(
     tabPanel("INSTRUCTIONS",
              fluidPage(
                h3("Input Data Instructions"),
-               p("ezVolcano accepts tabular data in the following formats: .csv, .tsv, .txt, and .xlsx Microsoft Excel files. The app will automatically detect the file type."),
+               p("ezVolcano accepts tabular data as TXT, CSV, TSV, and XLSX files."),
                br(),
                h4("Data Format Requirements"),
                p("The data must be structured as follows:"),
@@ -272,11 +272,11 @@ ui <- fluidPage(
                p("Source code is available at: ",
                  a(href = "https://github.com/chenr47/ezVolcano", "https://github.com/chenr47/ezVolcano")
                ),
-               p("ezVolcano is very easy to set up locally (see the GitHub tutorial), and this is strongly recommended as currently the active hours hosted by shinyapps.io are limited."),
+               p("ezVolcano is easy to set up locally (see the GitHub tutorial)."),
 
                br(),
-               h4("Credits"),
-               p("The source code from the easylabel R package by Myles Lewis was used to enable interactive annotation labels and the save system for them. This package served as inspiration for creating ezVolcano, with a focus on making the tool easy to use and accessible to the broader scientific community.")
+               h4("Acknowledgement"),
+               p("To enable interactive labels, some source code from the easylabel R package by Myles Lewis was used (https://github.com/myles-lewis/easylabel).")
              )
     )
   )
