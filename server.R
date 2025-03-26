@@ -6,9 +6,11 @@ library(shinyjs)
 library(readxl)
 
 server <- function(input, output, session) {
+  #track filename and if data file or save file was loaded
   is_save <- reactiveVal(0)
   plot_filename <- reactiveVal("")
 
+  #download examples
   output$example_data <- downloadHandler(
     filename = function() {
       "example_data.csv"
@@ -45,8 +47,7 @@ server <- function(input, output, session) {
   #Batch gene input
   batchModal <- function() {
     modalDialog(
-      textAreaInput("batchlabs", "Type or paste a list of genes",
-                    height = '300px'),
+      textAreaInput("batchlabs", "Type or paste a list of genes", height = '300px'),
       easyClose = TRUE,
       footer = tagList(
         modalButton("Cancel"),
@@ -59,15 +60,15 @@ server <- function(input, output, session) {
     showModal(batchModal())
   })
 
-  #Add batch genes
+  #add batch genes
   observeEvent(input$batch_ok, {
     req(input$batchlabs)
     if (!is.null(input$batchlabs)) {
       batch_genes <- unlist(strsplit(input$batchlabs, ",| |\n"))
-      batch_genes <- batch_genes[batch_genes %in% labelchoices()]  # Check against available genes
+      batch_genes <- batch_genes[batch_genes %in% labelchoices()]
       if (length(batch_genes) > 0) {
         current_labels <- lapply(labels$list, function(x) x$name)
-        new_labels <- setdiff(batch_genes, current_labels)  # Only add new labels
+        new_labels <- setdiff(batch_genes, current_labels)
         for (gene in new_labels) {
           gene_data <- data()[Gene == gene]
           x_val <- gene_data$x[1]
@@ -79,22 +80,28 @@ server <- function(input, output, session) {
     }
   })
 
+  #clear all annotation labels
   observeEvent(input$clear_label, {
     updateSelectizeInput(session, "label", selected = character(0))
   })
 
+  #flip x-axis
   observeEvent(input$flip_x, {
     for (gene in names(labelsxy$list)) {
       labelsxy$list[[gene]]$ax <- -labelsxy$list[[gene]]$ax
     }
   })
 
+  #function to draw the main plotly plot
   main_plotly <- function(data) {
     if (is.null(data)) {
       return(NULL)
     }
+	
+	#transform the y-axis values
     stat_threshold <- -log10(input$stat_threshold)
 
+	#switch between regular fold change and z-scores for x-axis
     x_label <- if (!is.null(input$x_label) && input$x_label != "") {
       input$x_label
     } else {
@@ -105,6 +112,7 @@ server <- function(input, output, session) {
       }
     }
 
+	#adjust x-axis values based on whether user wants it flipped and/or z-score
     if (input$use_zscore && input$flip_x) {
       temp_x <- data$zscore_flip_x
     } else if (input$use_zscore) {
@@ -115,6 +123,7 @@ server <- function(input, output, session) {
       temp_x <- data$x
     }
 
+	#adjust annotation x-axis values based on above
     if (length(labels$list) > 0) {
       for (i in 1:length(labels$list)) {
         gene_name <- labels$list[[i]]$name
@@ -132,6 +141,7 @@ server <- function(input, output, session) {
       }
     }
 
+	#adjust x-axis limits
     if (input$center_x) {
       if (!is.na(input$xlim1) || !is.na(input$xlim2)) {
         max_x <- max(abs(c(input$xlim1, input$xlim2)), na.rm = TRUE)
@@ -149,10 +159,9 @@ server <- function(input, output, session) {
         xlim <- range(temp_x, na.rm = TRUE)
       }
     }
-
-
     xlim <- c(xlim[1] * input$xlim_pad, xlim[2] * input$xlim_pad)
 
+	#adjust y-axis limits
     temp_y <- -log10(data$y)
 
     if (input$center_y) {
@@ -176,14 +185,14 @@ server <- function(input, output, session) {
 
     ylim <- c(ylim[1] * input$ylim_pad, ylim[2] * input$ylim_pad)
 
-
-
+	#If no user input, plot title is the filename
     if (input$plot_title != "") {
       temp_title <- input$plot_title
     } else {
       temp_title <- plot_filename()
     }
 
+	#Switch effect size threshold if using z-score
     if (input$use_zscore) {
       effect_size_left_temp <- input$effect_size_left_z
       effect_size_right_temp <- input$effect_size_right_z
@@ -192,7 +201,7 @@ server <- function(input, output, session) {
       effect_size_right_temp <- input$effect_size_right
     }
 
-
+	#legend and datapoint colors
     legend_con_m <- as.character(input$legend_con_m)
     legend_con_l <- as.character(input$legend_con_l)
     legend_con_r <- as.character(input$legend_con_r)
@@ -206,6 +215,7 @@ server <- function(input, output, session) {
     color_mapping <- setNames(c(input$middle_color, input$left_color, input$right_color),
                               c(legend_con_m, legend_con_l, legend_con_r))
 
+	#make plotly
     p <- plot_ly(data, x = temp_x, y = ~-log10(y), type = 'scatter', mode = 'markers', color = ~condition,  colors = color_mapping,
                  marker = list(opacity = input$point_opacity, symbol = input$point_shape, size = input$point_size, line = list(color = input$point_outline_color, width = input$point_outline_width)),
                  text = ~Gene, hoverinfo = 'x+y+text', key = ~Gene, source = "volcano_plot", width = input$plot_width, height = input$plot_height) %>%
@@ -312,11 +322,12 @@ server <- function(input, output, session) {
       ) %>%
       config(edits = list(annotationTail = TRUE))
 
-
+	#add legend
     if (!input$show_legend) {
       p <- p %>% layout(showlegend = FALSE)
     }
 
+	#flip legend order
     if (!input$legend_traceorder) {
       p <- p %>% layout(
         legend = list(
@@ -325,6 +336,7 @@ server <- function(input, output, session) {
       )
     }
 
+	#add outline trace for annotation labels 
     p <- p %>%
       add_trace(
         x = unlist(lapply(labels$list, `[[`, "x")),
@@ -335,12 +347,11 @@ server <- function(input, output, session) {
         inherit = FALSE,
         showlegend = FALSE
       )
-
-
     event_register(p, "plotly_click")
     return(p)
   }
 
+  #create annotation labels for plotly
   create_annotations <- function(label_list, label_xy_list) {
     if (length(label_list) == 0) {
       return(list())
@@ -373,6 +384,8 @@ server <- function(input, output, session) {
     return(annotations)
   }
 
+  #add/remove labels after user clicks
+  #Modified code from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel)
   observe({
     s <- event_data("plotly_click", source = "volcano_plot", priority = "event")
     req(s)
@@ -400,6 +413,8 @@ server <- function(input, output, session) {
     })
   })
 
+  # store the location of moved labels by detecting plotly relayout events of the type `annotations[1].ax`
+  #Code from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel)
   observeEvent(event_data("plotly_relayout", source = 'volcano_plot'), {
     s <- event_data("plotly_relayout", source = 'volcano_plot')
 
@@ -409,6 +424,7 @@ server <- function(input, output, session) {
     }
   })
 
+  #selectizeInput
   input_label <- reactive({ input$label }) %>% debounce(500)
 
   observeEvent(input_label(), {
@@ -438,31 +454,29 @@ server <- function(input, output, session) {
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
 
-
+  #update plotly labels
   observeEvent(labels$list, {
     labs <- unlist(lapply(labels$list, function(x) x$name))
     current_xy <- labelsxy$list
     annot <- create_annotations(labels$list, labelsxy$list)
     labelsxy$list <- lapply(annot, function(i) list(ax = i$ax, ay = i$ay))
     names(labelsxy$list) <- labs
-    plotlyProxy('plot', session) %>%
-      plotlyProxyInvoke("relayout",
-                        list(annotations = annot))
+    plotlyProxy('plot', session) %>% plotlyProxyInvoke("relayout", list(annotations = annot))
     sel_labels <- input$label
     sel_labels <- which(unique(data()$Gene) %in% sel_labels)
     if (any(!unique(unlist(lapply(labels$list, function(x) x$name))) %in% unique(data()$Gene)[sel_labels]) | any(!unique(data()$Gene)[sel_labels] %in% unique(unlist(lapply(labels$list, function(x) x$name))))) {
-      updateSelectizeInput(session, 'label', choices = unique(data()$Gene),
-                           selected = unlist(lapply(labels$list, function(x) x$name)), server = TRUE)
+      updateSelectizeInput(session, 'label', choices = unique(data()$Gene), selected = unlist(lapply(labels$list, function(x) x$name)), server = TRUE)
     }
   })
 
+  #output the plotly plot
   output$plot <- renderPlotly({
     req(data())
     df <- data()
     main_plotly(df)
   })
 
-
+  #save plot
   output$save_state <- downloadHandler(
     filename = function() {
 
@@ -471,7 +485,6 @@ server <- function(input, output, session) {
       } else if (is_save() == 1) {
         file_name <- tools::file_path_sans_ext(basename(input$file1$name))
       }
-
       paste0(input$prefix, file_name, input$suffix, ".rds")
     },
     content = function(file) {
@@ -487,6 +500,7 @@ server <- function(input, output, session) {
     }
   )
 
+  #save config file of aesthetic settings
   output$save_config <- downloadHandler(
     filename = function() {
       file_name <- "_config.rds"
@@ -502,6 +516,7 @@ server <- function(input, output, session) {
     }
   )
 
+  #load config file
   observeEvent(input$load_config, {
     req(input$load_config)
     state <- readRDS(input$load_config$datapath)
@@ -530,7 +545,7 @@ server <- function(input, output, session) {
     })
   })
 
-
+  #load plot save
   observeEvent(input$load_state, {
     req(input$load_state)
     reset("file1")
@@ -576,7 +591,7 @@ server <- function(input, output, session) {
     })
   })
 
-
+  #load data file
   observeEvent(input$file1, {
     req(input$file1)
     ext <- tools::file_ext(input$file1$name)
