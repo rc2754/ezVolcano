@@ -385,7 +385,7 @@ server <- function(input, output, session) {
   }
 
   #add/remove labels after user clicks
-  #Modified code from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel)
+  #code is modified from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel)
   observe({
     s <- event_data("plotly_click", source = "volcano_plot", priority = "event")
     req(s)
@@ -413,8 +413,8 @@ server <- function(input, output, session) {
     })
   })
 
-  # store the location of moved labels by detecting plotly relayout events of the type `annotations[1].ax`
-  #Code from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel)
+  #store the location of moved labels by detecting plotly relayout events of the type `annotations[1].ax`
+  #code is from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel)
   observeEvent(event_data("plotly_relayout", source = 'volcano_plot'), {
     s <- event_data("plotly_relayout", source = 'volcano_plot')
 
