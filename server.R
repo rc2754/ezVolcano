@@ -97,9 +97,6 @@ server <- function(input, output, session) {
     if (is.null(data)) {
       return(NULL)
     }
-	
-	#transform the y-axis values
-    stat_threshold <- -log10(input$stat_threshold)
 
 	#switch between regular fold change and z-scores for x-axis
     x_label <- if (!is.null(input$x_label) && input$x_label != "") {
@@ -278,7 +275,7 @@ server <- function(input, output, session) {
         shapes = list(
           list(type = "line",
                x0 = 0, x1 = 1, xref = "paper",
-               y0 = stat_threshold, y1 = stat_threshold,
+               y0 = input$stat_threshold, y1 = input$stat_threshold,
                line = list(color = input$stat_threshold_color, width = input$stat_threshold_size, dash = input$stat_threshold_pattern)),
           list(type = "line",
                x0 = effect_size_left_temp, x1 = effect_size_left_temp,
