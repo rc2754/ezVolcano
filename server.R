@@ -14,7 +14,7 @@ server <- function(input, output, session) {
       "example_data.csv"
     },
     content = function(file) {
-      file.copy("www/example_data.txt", file)}
+      file.copy("examples/example_data.txt", file)}
   )
 
   output$example_save <- downloadHandler(
@@ -22,7 +22,7 @@ server <- function(input, output, session) {
       "example_save.rds"
     },
     content = function(file) {
-      file.copy("www/example_save.rds", file)}
+      file.copy("examples/example_save.rds", file)}
   )
 
   output$example_config <- downloadHandler(
@@ -30,20 +30,19 @@ server <- function(input, output, session) {
       "example_config.rds"
     },
     content = function(file) {
-      file.copy("www/example_config.rds", file)}
+      file.copy("examples/example_config.rds", file)}
   )
 
-  # Reactive values for storing labels and their positions
+  #Reactive values
   data <- reactiveVal()
   labels <- reactiveValues(list = list())
   labelsxy <- reactiveValues(list = list())
 
-  # Define labelchoices as a reactive expression
   labelchoices <- reactive({
     unique(data()$Gene)
   })
 
-  # Modal for batch gene input
+  #Batch gene input
   batchModal <- function() {
     modalDialog(
       textAreaInput("batchlabs", "Type or paste a list of genes",
@@ -56,12 +55,11 @@ server <- function(input, output, session) {
     )
   }
 
-  # Open modal when button pressed
   observeEvent(input$add_batch, {
     showModal(batchModal())
   })
 
-  # Add batch genes
+  #Add batch genes
   observeEvent(input$batch_ok, {
     req(input$batchlabs)
     if (!is.null(input$batchlabs)) {
@@ -93,46 +91,43 @@ server <- function(input, output, session) {
 
   main_plotly <- function(data) {
     if (is.null(data)) {
-      return(NULL)  # Avoid plotting when data is NULL
+      return(NULL)
     }
     stat_threshold <- -log10(input$stat_threshold)
 
-    # Determine the x-axis label. If user has set input$x_label, use that, otherwise default.
     x_label <- if (!is.null(input$x_label) && input$x_label != "") {
-      input$x_label  # Use the user-provided label if available
+      input$x_label
     } else {
       if (input$use_zscore) {
-        "FoldChange Z-Score"  # Default label for zscore
+        "FoldChange Z-Score"
       } else {
-        "log<sub>2</sub>(FoldChange)"  # Default label for log2 fold change
+        "log<sub>2</sub>(FoldChange)"
       }
     }
 
     if (input$use_zscore && input$flip_x) {
-      temp_x <- data$zscore_flip_x  # If both zscore and flip_x are selected
+      temp_x <- data$zscore_flip_x
     } else if (input$use_zscore) {
-      temp_x <- data$zscore  # If only zscore is selected
+      temp_x <- data$zscore
     } else if (input$flip_x) {
-      temp_x <- data$flip_x  # If only flip_x is selected
+      temp_x <- data$flip_x
     } else {
-      temp_x <- data$x  # If neither are selected, use the original x
+      temp_x <- data$x
     }
 
-    # Only run the loop if labels$list has elements
     if (length(labels$list) > 0) {
-      # Loop through the labels$list to match gene names and update x values
       for (i in 1:length(labels$list)) {
         gene_name <- labels$list[[i]]$name
-        gene_index <- which(data$Gene == gene_name)  # Find the index of the gene in data$Gene
+        gene_index <- which(data$Gene == gene_name)
 
         if (input$use_zscore && input$flip_x) {
-          labels$list[[i]]$x <- data$zscore_flip_x[gene_index]  # Update x with zscore_flip_x
+          labels$list[[i]]$x <- data$zscore_flip_x[gene_index]
         } else if (input$use_zscore) {
-          labels$list[[i]]$x <- data$zscore[gene_index]  # Update x with zscore
+          labels$list[[i]]$x <- data$zscore[gene_index]
         } else if (input$flip_x) {
-          labels$list[[i]]$x <- data$flip_x[gene_index]  # Update x with flip_x
+          labels$list[[i]]$x <- data$flip_x[gene_index]
         } else {
-          labels$list[[i]]$x <- data$x[gene_index]  # Update x with original x
+          labels$list[[i]]$x <- data$x[gene_index]
         }
       }
     }
@@ -175,7 +170,7 @@ server <- function(input, output, session) {
         )
       } else {
         ylim <- range(temp_y, na.rm = TRUE)
-        ylim <- c(ylim[1] - input$zero_pad, ylim[2])  # Apply zero padding
+        ylim <- c(ylim[1] - input$zero_pad, ylim[2])
       }
     }
 
@@ -198,23 +193,19 @@ server <- function(input, output, session) {
     }
 
 
-    # Convert the inputs to strings (in case they are not already)
     legend_con_m <- as.character(input$legend_con_m)
     legend_con_l <- as.character(input$legend_con_l)
     legend_con_r <- as.character(input$legend_con_r)
 
-    # Create a separate condition label column for the legend
     data$condition <- factor(ifelse(-log10(data$y) < input$stat_threshold, legend_con_m,
                                     ifelse(temp_x < effect_size_left_temp, legend_con_l,
                                            ifelse(temp_x > effect_size_right_temp, legend_con_r, legend_con_m))),
                              levels = c(legend_con_m, legend_con_l, legend_con_r))
 
 
-    # Define color mapping based on condition names using setNames()
     color_mapping <- setNames(c(input$middle_color, input$left_color, input$right_color),
                               c(legend_con_m, legend_con_l, legend_con_r))
 
-    # Generate the base plot
     p <- plot_ly(data, x = temp_x, y = ~-log10(y), type = 'scatter', mode = 'markers', color = ~condition,  colors = color_mapping,
                  marker = list(opacity = input$point_opacity, symbol = input$point_shape, size = input$point_size, line = list(color = input$point_outline_color, width = input$point_outline_width)),
                  text = ~Gene, hoverinfo = 'x+y+text', key = ~Gene, source = "volcano_plot", width = input$plot_width, height = input$plot_height) %>%
@@ -230,7 +221,7 @@ server <- function(input, output, session) {
           title = list(
             text = x_label,
             standoff = input$x_standoff,
-            font = list(  # Correct placement for axis title font
+            font = list(
               size = input$x_label_size,
               family = input$font_axis_label,
               color = input$color_axis_label
@@ -241,7 +232,7 @@ server <- function(input, output, session) {
           zeroline = FALSE,
           ticklen = input$x_tick_length,
           linecolor = input$color_axisline,
-          tickfont = list(  # Correct placement for tick font
+          tickfont = list(
             size = input$x_scale_size,
             family = input$font_axis,
             color = input$color_axis
@@ -254,7 +245,7 @@ server <- function(input, output, session) {
           title = list(
             text = input$y_label,
             standoff = input$y_standoff,
-            font = list(  # Correct placement for axis title font
+            font = list(
               size = input$y_label_size,
               family = input$font_axis_label,
               color = input$color_axis_label
@@ -265,7 +256,7 @@ server <- function(input, output, session) {
           zeroline = FALSE,
           ticklen = input$y_tick_length,
           linecolor = input$color_axisline,
-          tickfont = list(  # Correct placement for tick font
+          tickfont = list(
             size = input$y_scale_size,
             family = input$font_axis,
             color = input$color_axis
@@ -300,20 +291,20 @@ server <- function(input, output, session) {
         legend = list(
           traceorder = "normal",
           title = list(
-            text = input$legend_title,  # Set the legend title here
+            text = input$legend_title,
             font = list(
-              size = input$legend_title_size, family = input$font_legend, color = input$color_legend  # Set the font size of the title
+              size = input$legend_title_size, family = input$font_legend, color = input$color_legend
             )
           ),
-          x = input$legend_x,    # Horizontal position (0 = far left, 1 = far right)
-          y = input$legend_y,    # Vertical position (0 = bottom, 1 = top)
-          xanchor = "center",    # Anchor point for the legend box
-          yanchor = "middle",    # Anchor point for the legend box
-          font = list(            # Set font size for the legend labels
-            size = input$legend_label_size, family = input$font_legend_label, color = input$color_legend_label  # Adjust this for label font size
+          x = input$legend_x,
+          y = input$legend_y,
+          xanchor = "center",
+          yanchor = "middle",
+          font = list(
+            size = input$legend_label_size, family = input$font_legend_label, color = input$color_legend_label
           ),
-          bordercolor = input$legend_box_color,  # Color of the legend box outline
-          borderwidth = input$legend_box_width,  # Line width of the legend box outline
+          bordercolor = input$legend_box_color,
+          borderwidth = input$legend_box_width,
           bgcolor = input$legend_box_bgcolor
         ),
         showlegend = TRUE,
@@ -346,14 +337,13 @@ server <- function(input, output, session) {
       )
 
 
-    event_register(p, "plotly_click")  # Register event tracking for clicks
+    event_register(p, "plotly_click")
     return(p)
   }
 
-  # Function to create annotations based on stored labels
   create_annotations <- function(label_list, label_xy_list) {
     if (length(label_list) == 0) {
-      return(list())  # Return an empty list if no labels
+      return(list())
     }
 
     annotations <- lapply(seq_along(label_list), function(i) {
@@ -365,7 +355,6 @@ server <- function(input, output, session) {
         ay_val <- label_xy_list[[i]]$ay
       }
 
-      # Default x position
       x_pos <- label_list[[i]]$x
 
       list(
@@ -389,12 +378,11 @@ server <- function(input, output, session) {
     req(s)
 
     s_key <- unlist(s$key)
-    s_xy <- paste(s$x, s$y, sep = "_") # Concatenate x and y coordinates
+    s_xy <- paste(s$x, s$y, sep = "_")
     isolate({
       existing_index <- which(s_xy == sapply(labels$list, function(x) paste(x$x, x$y, sep = "_")))
 
       if (is.null(s$key)) {
-        # If s$key is NULL, remove the label if it exists
         if (length(existing_index) > 0) {
           labels$list <- labels$list[-existing_index]
           labelsxy$list <- labelsxy$list[-existing_index]
@@ -412,7 +400,6 @@ server <- function(input, output, session) {
     })
   })
 
-  # Store the location of moved labels by detecting Plotly relayout events
   observeEvent(event_data("plotly_relayout", source = 'volcano_plot'), {
     s <- event_data("plotly_relayout", source = 'volcano_plot')
 
@@ -422,10 +409,8 @@ server <- function(input, output, session) {
     }
   })
 
-  # Selectize genes
   input_label <- reactive({ input$label }) %>% debounce(500)
 
-  # Update labels from selectize
   observeEvent(input_label(), {
     currentsel <- input_label()
     labelchoices <- unique(data()$Gene)
@@ -454,11 +439,9 @@ server <- function(input, output, session) {
 
 
 
-  # update plotly labels
   observeEvent(labels$list, {
     labs <- unlist(lapply(labels$list, function(x) x$name))
     current_xy <- labelsxy$list
-    # Annotate gene labels
     annot <- create_annotations(labels$list, labelsxy$list)
     labelsxy$list <- lapply(annot, function(i) list(ax = i$ax, ay = i$ay))
     names(labelsxy$list) <- labs
@@ -473,11 +456,10 @@ server <- function(input, output, session) {
     }
   })
 
-  # Render the volcano plot
   output$plot <- renderPlotly({
     req(data())
-    df <- data()  # Access the latest dataframe from the reactive value
-    main_plotly(df)  # Pass the dataframe to your plot function
+    df <- data()
+    main_plotly(df)
   })
 
 
@@ -485,19 +467,18 @@ server <- function(input, output, session) {
     filename = function() {
 
       if (is_save() == 2) {
-        file_name <- tools::file_path_sans_ext(basename(input$load_state$name))  # Extract file name without extension for RDS
+        file_name <- tools::file_path_sans_ext(basename(input$load_state$name))
       } else if (is_save() == 1) {
-        file_name <- tools::file_path_sans_ext(basename(input$file1$name))  # Extract file name without extension for CSV
+        file_name <- tools::file_path_sans_ext(basename(input$file1$name))
       }
 
-      # Append '_SaveState' to the file name
       paste0(input$prefix, file_name, input$suffix, ".rds")
     },
     content = function(file) {
       saveRDS(
         list(
           data = data(),
-          input_values = reactiveValuesToList(input),  # Save all input values, including flip_x
+          input_values = reactiveValuesToList(input),
           labels = labels$list,
           labelsxy = labelsxy$list
         ),
@@ -508,13 +489,13 @@ server <- function(input, output, session) {
 
   output$save_config <- downloadHandler(
     filename = function() {
-      file_name <- "_config.rds"  # Set your desired filename
-      return(file_name)  # Return the filename
+      file_name <- "_config.rds"
+      return(file_name)
     },
     content = function(file) {
       saveRDS(
         list(
-          input_values = reactiveValuesToList(input)  # Save all input values, including flip_x
+          input_values = reactiveValuesToList(input)
         ),
         file = file
       )
@@ -523,26 +504,29 @@ server <- function(input, output, session) {
 
   observeEvent(input$load_config, {
     req(input$load_config)
-    state <- readRDS(input$load_config$datapath)  # Read the uploaded file
+    state <- readRDS(input$load_config$datapath)
 
-    # Restore input values
+    if (!is.list(state$input_values) || length(state$input_values) != 107) {
+      output$error_message3 <- renderText("Invalid file.")
+      return()
+    }
+    output$error_message3 <- renderText("")
+
     for (name in names(state$input_values)) {
-      if (name %in% names(input)) {  # Only update existing inputs
+      if (name %in% names(input)) {
         updateTextInput(session, name, value = state$input_values[[name]])
         updateNumericInput(session, name, value = state$input_values[[name]])
         updateCheckboxInput(session, name, value = state$input_values[[name]])
       }
     }
 
-    # Explicitly update flip_x
     if (!is.null(state$input_values$flip_x)) {
       updateCheckboxInput(session, "flip_x", value = state$input_values$flip_x)
     }
 
-    # Update the plot
     output$plot <- renderPlotly({
-      df <- data()  # Access the latest dataframe from the reactive value
-      main_plotly(df)  # Pass the dataframe to your plot function
+      df <- data()
+      main_plotly(df)
     })
   })
 
@@ -551,51 +535,50 @@ server <- function(input, output, session) {
     req(input$load_state)
     reset("file1")
     reset("load_config")
-    state <- readRDS(input$load_state$datapath)  # Read the uploaded file
+    state <- readRDS(input$load_state$datapath)
 
-    # Restore data into the reactive data object
-    data(state$data)  # Update the reactive data with state$data
+    if (!is.numeric(state$data$x) || !is.numeric(state$data$y)) {
+      output$error_message2 <- renderText("Invalid file.")
+      return()
+    }
+    output$error_message2 <- renderText("")
+
+    data(state$data)
     is_save(2)
     plot_filename (tools::file_path_sans_ext(basename(input$load_state$name)))
 
-    # Restore input values
     for (name in names(state$input_values)) {
-      if (name %in% names(input)) {  # Only update existing inputs
+      if (name %in% names(input)) {
         updateTextInput(session, name, value = state$input_values[[name]])
         updateNumericInput(session, name, value = state$input_values[[name]])
         updateCheckboxInput(session, name, value = state$input_values[[name]])
       }
     }
 
-    # Explicitly update flip_x
     if (!is.null(state$input_values$flip_x)) {
       updateCheckboxInput(session, "flip_x", value = state$input_values$flip_x)
     }
 
-    # Restore labels and their positions
     labels$list <- state$labels
     labelsxy$list <- state$labelsxy
 
-    # Ensure selectize input updates properly
-    valid_labels <- unique(state$data$Gene)  # Get the available gene names
-    selected_labels <- intersect(state$input_values$label, valid_labels)  # Keep only valid selections
+    valid_labels <- unique(state$data$Gene)
+    selected_labels <- intersect(state$input_values$label, valid_labels)
 
     updateSelectizeInput(session, 'label',
                          choices = valid_labels,
                          selected = selected_labels,
                          server = TRUE)
 
-    # Update the plot
     output$plot <- renderPlotly({
-      df <- data()  # Access the latest dataframe from the reactive value
-      main_plotly(df)  # Pass the dataframe to your plot function
+      df <- data()
+      main_plotly(df)
     })
   })
 
 
-  # Load the data file when the user uploads a new one
   observeEvent(input$file1, {
-    req(input$file1)  # Ensure a file is selected
+    req(input$file1)
     ext <- tools::file_ext(input$file1$name)
     reset("load_state")
     reset("load_config")
@@ -605,10 +588,23 @@ server <- function(input, output, session) {
     } else if (ext == "xlsx") {
       df <- df <- as.data.table(read_excel(input$file1$datapath))
     } else {
-      validate("Invalid file type.")
+      output$error_message1 <- renderText("Invalid file type. Please upload a CSV, TSV, or XLSX file.")
+      return()
+    }
+
+    if (ncol(df) < 3) {
+      output$error_message1 <- renderText("The uploaded file must have at least 3 columns.")
+      return()
     }
 
     colnames(df)[c(1, 2, 3)] <- c("Gene", "x", "y")
+
+    if (!is.numeric(df$x) || !is.numeric(df$y)) {
+      output$error_message1 <- renderText("Columns 'x' and 'y' must be numeric.")
+      return()
+    }
+
+    output$error_message1 <- renderText("")
 
     df$zscore <- scale(df$x)
     df$flip_x <- -df$x
@@ -616,11 +612,9 @@ server <- function(input, output, session) {
     is_save(1)
     plot_filename (tools::file_path_sans_ext(basename(input$file1$name)))
 
-    valid_labels <- unique(df$Gene)  # Get the available gene names
-    selected_labels <- intersect(input$label, valid_labels)  # Keep only valid selections
+    valid_labels <- unique(df$Gene)
+    selected_labels <- intersect(input$label, valid_labels)
 
-
-    # Restore previous selection if still valid
     updateSelectizeInput(session, 'label',
                          choices = valid_labels,
                          selected = selected_labels,
@@ -630,13 +624,10 @@ server <- function(input, output, session) {
       labels$list <- labels$list[sapply(labels$list, function(x) x$name %in% selected_labels)]
     }
 
-    # Only run the loop if labels$list has elements
     if (length(labels$list) > 0) {
-
-      # Loop through the labels$list to match gene names and update x values
       for (i in 1:length(labels$list)) {
         gene_name <- labels$list[[i]]$name
-        gene_index <- which(df$Gene == gene_name)  # Find the index of the gene in data$Gene
+        gene_index <- which(df$Gene == gene_name)
 
         labels$list[[i]]$y <- -log10(pmax(df$y[gene_index], 1e-300))
 
@@ -653,10 +644,9 @@ server <- function(input, output, session) {
     }
 
     data(df)
-    # Update the plot
     output$plot <- renderPlotly({
-      df <- data()  # Access the latest dataframe from the reactive value
-      main_plotly(df)  # Pass the dataframe to your plot function
+      df <- data()
+      main_plotly(df)
     })
   })
 }
