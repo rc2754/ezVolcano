@@ -588,7 +588,7 @@ server <- function(input, output, session) {
     } else if (ext == "xlsx") {
       df <- df <- as.data.table(read_excel(input$file1$datapath))
     } else {
-      output$error_message1 <- renderText("Invalid file type. Please upload a CSV, TSV, or XLSX file.")
+      output$error_message1 <- renderText("Invalid file type. Please upload a TXT, CSV, TSV, or XLSX file.")
       return()
     }
 
