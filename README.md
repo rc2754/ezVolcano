@@ -49,7 +49,7 @@ Use the `Save configuration` button to save only your aesthetic settings.
 Example files are available for download in the app.
 
 ## Authors
-`ezVolcano` was developed by Richard Chen in the Proteomics Core Facility at Brown University.
+`ezVolcano` was developed by Richard Chen at the Proteomics Core Facility of Brown University.
 
 `ezVolcano` uses source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
 
