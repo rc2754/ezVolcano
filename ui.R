@@ -22,24 +22,24 @@ ui <- fluidPage(
     tabPanel("Plot",
              sidebarLayout(
                sidebarPanel(
-                 fileInput("file1", "Load a data file", accept = c(".csv", ".txt", ".tsv", ".xlsx")),
+                 fileInput("file1", "Load a data file", accept = c(".csv", ".txt", ".tsv", ".xlsx")), verbatimTextOutput("error_message1"),
                  fluidRow(
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
 
-                   column(12, fileInput("load_state", "Load save file", accept = c(".rds"))),
+                   column(12, fileInput("load_state", "Load save file", accept = c(".rds"))), verbatimTextOutput("error_message2"),
                    column(12, downloadButton("save_state", "Save plot")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
-                   column(12, fileInput("load_config", "Load config file", accept = c(".rds"))),
+                   column(12, fileInput("load_config", "Load config file", accept = c(".rds"))), verbatimTextOutput("error_message3"),
                    column(12, downloadButton("save_config", "Save configuration")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
-				   
+
                    column(12, selectizeInput('label', 'Select labels', choices = NULL, options = list(onInitialize = I('function() { this.setValue(""); }')), multiple = TRUE)),
                    column(6, textInput("prefix", "Save file prefix", value = "")),
                    column(6, textInput("suffix", "Save file suffix", value = "")),
                    column(6, actionButton("add_batch", "Add batch labels")),
                    column(6, actionButton("clear_label", "Clear labels")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
-				   
+
                    column(12, textInput("plot_title", "Plot title", value = "")),
                    column(6, textInput("x_label", "x-axis label", value = "")),
                    column(6, textInput("y_label", "y-axis label", value = "-log<sub>10</sub>(P.adj)")),
@@ -270,7 +270,7 @@ ui <- fluidPage(
                br(),
                h4("Source"),
                p("Source code is available at: ",
-                 a(href = "https://github.com/chenr47/ezVolcano", "https://github.com/chenr47/ezVolcano") 
+                 a(href = "https://github.com/chenr47/ezVolcano", "https://github.com/chenr47/ezVolcano")
                ),
                p("ezVolcano is very easy to set up locally (see the GitHub tutorial), and this is strongly recommended as currently the active hours hosted by shinyapps.io are limited."),
 
