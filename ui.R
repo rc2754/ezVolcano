@@ -204,23 +204,23 @@ ui <- fluidPage(
                p("ezVolcano accepts tabular data as TXT, CSV, TSV, and XLSX files."),
                br(),
                h4("Data Format Requirements"),
-               p("The data must be structured as follows:"),
+               p("The data file must be structured as follows:"),
 
                tags$ul(
                  tags$li(HTML("<b>The first column</b> must contain gene/protein names or some other identifier.")),
-                 tags$li(HTML("<b>The second column</b> should represent the x-axis, such as effect size, fold change, or z-scores.")),
-                 tags$li(HTML("<b>The third column</b> should represent the y-axis, such as p-value or FDR.")),
+                 tags$li(HTML("<b>The second column</b> must represent the x-axis, such as effect size, fold change, or z-scores.")),
+                 tags$li(HTML("<b>The third column</b> must represent the y-axis, such as p-value or FDR.")),
                  tags$li("Additional columns beyond the first three will be ignored.")
                ),
 
                br(),
-               h4("Customizing Datapoint Labels"),
-               p("Once your data is loaded, you can label your datapoints the following ways:"),
+               h4("Customizing Data Point Labels"),
+               p("Once your data is loaded, you can label your data points the following ways:"),
 
                tags$ul(
-                 tags$li("Click on data points to add and remove labels. You can also drag these labels around to reposition them."),
-                 tags$li(HTML("Use the <b>Select labels</b> selectize input to add and remove labels.")),
-                 tags$li("Use the batch input button to paste in a list of names.")
+                 tags$li("Click on data points to add and remove labels. You can drag these labels around to reposition them."),
+                 tags$li(HTML("Use the <b>Select labels</b> selectizer to add and remove labels.")),
+                 tags$li("Use the batch input button to paste in a list of names (space or comma delimited).")
                ),
 
                br(),
@@ -235,14 +235,14 @@ ui <- fluidPage(
                br(),
                h4("Saving Your Work"),
                tags$ul(
-                 tags$li("You can save the entire plot (datapoints, labels, and aesthetic settings), as a **save state** file. This can be re-loaded later to restore your work."),
-                 tags$li("You can also save just the aesthetic settings as a **configuration file**. This file can serve as a template to quickly adjust your plots in the future."),
-                 tags$li("To export your plot as a .PNG image, click the camera button in the plotly toolbar.")
+                 tags$li(HTML("You can save the entire plot (data points, labels, and aesthetic settings), as a <b>save file</b>. This can be re-loaded later to restore all data point labels and plot customizations.")),
+                 tags$li(HTML("You can also save only the aesthetic settings as a <b>configuration file</b>. This can be used as a template to quickly adjust plots in the future.")),
+
+                 tags$li("To export your plot as a .PNG image, click the camera button in the Plotly toolbar.")
                ),
 
                br(),
-               h4("Example Files"),
-               p("To help you get started, we’ve provided example files that demonstrate the required format. You can download them below:"),
+               h4("Examples"),
 
                tags$ul(
                  tags$li(downloadButton("example_data", "Example data file")),
