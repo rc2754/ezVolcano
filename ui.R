@@ -28,14 +28,14 @@ ui <- fluidPage(
 
                    column(12, fileInput("load_state", "Load save file", accept = c(".rds"))), verbatimTextOutput("error_message2"),
                    column(12, downloadButton("save_state", "Save plot")),
+                   column(6, textInput("prefix", "Save file prefix", value = "")),
+                   column(6, textInput("suffix", "Save file suffix", value = "")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
                    column(12, fileInput("load_config", "Load config file", accept = c(".rds"))), verbatimTextOutput("error_message3"),
                    column(12, downloadButton("save_config", "Save configuration")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
 
-                   column(12, selectizeInput('label', 'Select labels', choices = NULL, options = list(onInitialize = I('function() { this.setValue(""); }')), multiple = TRUE)),
-                   column(6, textInput("prefix", "Save file prefix", value = "")),
-                   column(6, textInput("suffix", "Save file suffix", value = "")),
+                   column(12, selectInput('label', 'Select labels', choices = NULL, multiple = TRUE)),
                    column(6, actionButton("add_batch", "Add batch labels")),
                    column(6, actionButton("clear_label", "Clear labels")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
@@ -54,6 +54,9 @@ ui <- fluidPage(
                    column(6, numericInput("effect_size_right", "Right threshold", value = 1.5, step = 0.1)),
                    column(6, numericInput("effect_size_left_z", "Left threshold (Z-score)", value = -1.96, step = 0.1)),
                    column(6, numericInput("effect_size_right_z", "Right threshold (Z-score)", value = 1.96, step = 0.1)),
+				   
+				   column(6, checkboxInput("hyperbola", "Hyperbolic", TRUE)),
+				   column(6, numericInput("curvature", "Curvature", value = 1, step = 0.1, min = 0.1)),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
 
                    column(6, numericInput("plot_width", "Plot width (px)", value = 1200)),
