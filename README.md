@@ -46,7 +46,7 @@ Use the camera button on the Plotly toolbar to export as .PNG file.
 
 Example files are available for download in the app.
 
-## Authors
+## Credit
 `ezVolcano` was developed by Richard Chen at the Proteomics Core Facility of Brown University.
 
 `ezVolcano` uses source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
