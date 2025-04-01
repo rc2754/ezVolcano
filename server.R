@@ -5,6 +5,8 @@ library(dplyr)
 library(shinyjs)
 library(readxl)
 
+options(warn = -1)
+
 server <- function(input, output, session) {
   #track filename and if data file or save file was loaded
   is_save <- reactiveVal(0)
@@ -82,14 +84,17 @@ server <- function(input, output, session) {
 
   #clear all annotation labels
   observeEvent(input$clear_label, {
-    updateSelectizeInput(session, "label", selected = character(0))
+    updateSelectInput(session, "label", selected = character(0))
   })
 
-  #flip x-axis
-  observeEvent(input$flip_x, {
-    for (gene in names(labelsxy$list)) {
-      labelsxy$list[[gene]]$ax <- -labelsxy$list[[gene]]$ax
+  flip_ax_values <- function() {
+    for (i in seq_along(labelsxy$list)) {
+      labelsxy$list[[i]]$ax <- -labelsxy$list[[i]]$ax
     }
+  }
+  #flip ax value of labels
+  observeEvent(input$flip_x, {
+    flip_ax_values()
   })
 
   #function to draw the main plotly plot
@@ -98,7 +103,7 @@ server <- function(input, output, session) {
       return(NULL)
     }
 
-	#switch between regular fold change and z-scores for x-axis
+    #switch between regular fold change and z-scores for x-axis
     x_label <- if (!is.null(input$x_label) && input$x_label != "") {
       input$x_label
     } else {
@@ -109,7 +114,7 @@ server <- function(input, output, session) {
       }
     }
 
-	#adjust x-axis values based on whether user wants it flipped and/or z-score
+    #adjust x-axis values based on whether user wants it flipped and/or z-score
     if (input$use_zscore && input$flip_x) {
       temp_x <- data$zscore_flip_x
     } else if (input$use_zscore) {
@@ -120,7 +125,7 @@ server <- function(input, output, session) {
       temp_x <- data$x
     }
 
-	#adjust annotation x-axis values based on above
+    #adjust annotation x-axis values based on above
     if (length(labels$list) > 0) {
       for (i in 1:length(labels$list)) {
         gene_name <- labels$list[[i]]$name
@@ -138,7 +143,7 @@ server <- function(input, output, session) {
       }
     }
 
-	#adjust x-axis limits
+    #adjust x-axis limits
     if (input$center_x) {
       if (!is.na(input$xlim1) || !is.na(input$xlim2)) {
         max_x <- max(abs(c(input$xlim1, input$xlim2)), na.rm = TRUE)
@@ -158,7 +163,7 @@ server <- function(input, output, session) {
     }
     xlim <- c(xlim[1] * input$xlim_pad, xlim[2] * input$xlim_pad)
 
-	#adjust y-axis limits
+    #adjust y-axis limits
     temp_y <- -log10(data$y)
 
     if (input$center_y) {
@@ -182,14 +187,14 @@ server <- function(input, output, session) {
 
     ylim <- c(ylim[1] * input$ylim_pad, ylim[2] * input$ylim_pad)
 
-	#If no user input, plot title is the filename
+    #If no user input, plot title is the filename
     if (input$plot_title != "") {
       temp_title <- input$plot_title
     } else {
       temp_title <- plot_filename()
     }
 
-	#Switch effect size threshold if using z-score
+    #Switch effect size threshold if using z-score
     if (input$use_zscore) {
       effect_size_left_temp <- input$effect_size_left_z
       effect_size_right_temp <- input$effect_size_right_z
@@ -198,21 +203,49 @@ server <- function(input, output, session) {
       effect_size_right_temp <- input$effect_size_right
     }
 
-	#legend and datapoint colors
+    #legend and datapoint colors
     legend_con_m <- as.character(input$legend_con_m)
     legend_con_l <- as.character(input$legend_con_l)
     legend_con_r <- as.character(input$legend_con_r)
 
-    data$condition <- factor(ifelse(-log10(data$y) < input$stat_threshold, legend_con_m,
-                                    ifelse(temp_x < effect_size_left_temp, legend_con_l,
-                                           ifelse(temp_x > effect_size_right_temp, legend_con_r, legend_con_m))),
-                             levels = c(legend_con_m, legend_con_l, legend_con_r))
+data$condition <- if (!input$hyperbola) {
+  # Default threshold-based categorization (same as before)
+  factor(
+    ifelse(-log10(data$y) < input$stat_threshold, legend_con_m,
+      ifelse(temp_x < effect_size_left_temp, legend_con_l,
+        ifelse(temp_x > effect_size_right_temp, legend_con_r,
+          legend_con_m
+        )
+      )
+    ),
+    levels = c(legend_con_m, legend_con_l, legend_con_r)
+  )
+} else {
+  # Hyperbola-based thresholding
+  hyperbola_threshold <- function(x, threshold, curvature, ref_point) {
+    abs(curvature / (x - ref_point)) + threshold
+  }
+
+  # Compute threshold for left and right regions
+  y_threshold_left  <- hyperbola_threshold(temp_x, input$stat_threshold, input$curvature, effect_size_left_temp)
+  y_threshold_right <- hyperbola_threshold(temp_x, input$stat_threshold, input$curvature, effect_size_right_temp)
+
+  # Assign colors based on hyperbola condition
+  factor(
+    ifelse(temp_x < effect_size_left_temp & -log10(data$y) > y_threshold_left, legend_con_l,
+      ifelse(temp_x > effect_size_right_temp & -log10(data$y) > y_threshold_right, legend_con_r,
+        legend_con_m
+      )
+    ),
+    levels = c(legend_con_m, legend_con_l, legend_con_r)
+  )
+}
 
 
     color_mapping <- setNames(c(input$middle_color, input$left_color, input$right_color),
                               c(legend_con_m, legend_con_l, legend_con_r))
 
-	#make plotly
+    #make plotly
     p <- plot_ly(data, x = temp_x, y = ~-log10(y), type = 'scatter', mode = 'markers', color = ~condition,  colors = color_mapping,
                  marker = list(opacity = input$point_opacity, symbol = input$point_shape, size = input$point_size, line = list(color = input$point_outline_color, width = input$point_outline_width)),
                  text = ~Gene, hoverinfo = 'x+y+text', key = ~Gene, source = "volcano_plot", width = input$plot_width, height = input$plot_height) %>%
@@ -272,20 +305,7 @@ server <- function(input, output, session) {
           dtick = input$y_ticks_interval,
           linewidth = input$y_line_thickness
         ),
-        shapes = list(
-          list(type = "line",
-               x0 = 0, x1 = 1, xref = "paper",
-               y0 = input$stat_threshold, y1 = input$stat_threshold,
-               line = list(color = input$stat_threshold_color, width = input$stat_threshold_size, dash = input$stat_threshold_pattern)),
-          list(type = "line",
-               x0 = effect_size_left_temp, x1 = effect_size_left_temp,
-               y0 = 0, y1 = 1, yref = "paper",
-               line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern)),
-          list(type = "line",
-               x0 = effect_size_right_temp, x1 = effect_size_right_temp,
-               y0 = 0, y1 = 1, yref = "paper",
-               line = list(color = input$effect_size_right_color, width = input$effect_size_right_size, dash = input$effect_size_right_pattern))
-        ),
+        shapes = generate_shapes(input, effect_size_left_temp, effect_size_right_temp),
         annotations = c(
           create_annotations(labels$list, labelsxy$list),
           list(
@@ -319,12 +339,12 @@ server <- function(input, output, session) {
       ) %>%
       config(edits = list(annotationTail = TRUE))
 
-	#add legend
+    #add legend
     if (!input$show_legend) {
       p <- p %>% layout(showlegend = FALSE)
     }
 
-	#flip legend order
+    #flip legend order
     if (!input$legend_traceorder) {
       p <- p %>% layout(
         legend = list(
@@ -332,8 +352,34 @@ server <- function(input, output, session) {
         )
       )
     }
+if (input$hyperbola) {
+  # Define the hyperbolic functions
+  hyperbola_left <- function(x) abs(input$curvature / (x - effect_size_left_temp)) + input$stat_threshold
+  hyperbola_right <- function(x) abs(input$curvature / (x - effect_size_right_temp)) + input$stat_threshold
+  
+  # Define the x-values for the left and right parts of the hyperbola
+  x_left <- seq(effect_size_left_temp - 0.0000000000000000000001, effect_size_left_temp - 1000, length.out = 500)
+  x_right <- seq(effect_size_right_temp + 0.0000000000000000000001, effect_size_right_temp + 1000, length.out = 500)
+  print(input$effect_size_right_color)
+  
+  # Add lines for the hyperbolic lines
+  p <- p %>% 
+    add_lines(
+      x = x_left,
+      y = hyperbola_left(x_left),
+      line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern),
+      name = "Left Hyperbola"
+    ) %>%
+    add_lines(
+      x = x_right,
+      y = hyperbola_right(x_right),
+      line = list(color = input$effect_size_right_color, width = input$effect_size_right_size, dash = input$effect_size_right_pattern),
+      name = "Right Hyperbola"
+    )
+}
 
-	#add outline trace for annotation labels 
+
+    #add outline trace for annotation labels
     p <- p %>%
       add_trace(
         x = unlist(lapply(labels$list, `[[`, "x")),
@@ -347,6 +393,31 @@ server <- function(input, output, session) {
     event_register(p, "plotly_click")
     return(p)
   }
+  
+#generate lines for plotly
+generate_shapes <- function(input, effect_size_left_temp, effect_size_right_temp) {
+ shapes <- list()
+  if (!input$hyperbola) {
+    # Standard threshold-based lines
+    shapes <- list(
+      list(type = "line",
+           x0 = 0, x1 = 1, xref = "paper",
+           y0 = input$stat_threshold, y1 = input$stat_threshold,
+           line = list(color = input$stat_threshold_color, width = input$stat_threshold_size, dash = input$stat_threshold_pattern)),
+      list(type = "line",
+           x0 = effect_size_left_temp, x1 = effect_size_left_temp,
+           y0 = 0, y1 = 1, yref = "paper",
+           line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern)),
+      list(type = "line",
+           x0 = effect_size_right_temp, x1 = effect_size_right_temp,
+           y0 = 0, y1 = 1, yref = "paper",
+           line = list(color = input$effect_size_right_color, width = input$effect_size_right_size, dash = input$effect_size_right_pattern))
+    )
+  }   
+  return(shapes)
+}
+
+
 
   #create annotation labels for plotly
   create_annotations <- function(label_list, label_xy_list) {
@@ -421,11 +492,9 @@ server <- function(input, output, session) {
     }
   })
 
-  #selectizeInput
-  input_label <- reactive({ input$label }) %>% debounce(500)
-
-  observeEvent(input_label(), {
-    currentsel <- input_label()
+  #SelectInput
+  observeEvent(input$label, {
+    currentsel <- input$label
     labelchoices <- unique(data()$Gene)
     convert_labs <- unlist(lapply(labels$list, function(x) x$name))
 
@@ -434,7 +503,6 @@ server <- function(input, output, session) {
       labelsxy$list <- list()
     } else if (any(!currentsel %in% convert_labs)) {
       addsel <- currentsel[!currentsel %in% convert_labs]
-
       for (i in addsel) {
         gene_data <- data()[Gene == i]
         x_val <- gene_data$x[1]
@@ -450,19 +518,12 @@ server <- function(input, output, session) {
     }
   }, ignoreNULL = FALSE, ignoreInit = TRUE)
 
-
   #update plotly labels
   observeEvent(labels$list, {
-    labs <- unlist(lapply(labels$list, function(x) x$name))
-    current_xy <- labelsxy$list
-    annot <- create_annotations(labels$list, labelsxy$list)
-    labelsxy$list <- lapply(annot, function(i) list(ax = i$ax, ay = i$ay))
-    names(labelsxy$list) <- labs
-    plotlyProxy('plot', session) %>% plotlyProxyInvoke("relayout", list(annotations = annot))
     sel_labels <- input$label
     sel_labels <- which(unique(data()$Gene) %in% sel_labels)
     if (any(!unique(unlist(lapply(labels$list, function(x) x$name))) %in% unique(data()$Gene)[sel_labels]) | any(!unique(data()$Gene)[sel_labels] %in% unique(unlist(lapply(labels$list, function(x) x$name))))) {
-      updateSelectizeInput(session, 'label', choices = unique(data()$Gene), selected = unlist(lapply(labels$list, function(x) x$name)), server = TRUE)
+      updateSelectInput(session, 'label', choices = unique(data()$Gene), selected = unlist(lapply(labels$list, function(x) x$name)))
     }
   })
 
@@ -532,9 +593,7 @@ server <- function(input, output, session) {
       }
     }
 
-    if (!is.null(state$input_values$flip_x)) {
-      updateCheckboxInput(session, "flip_x", value = state$input_values$flip_x)
-    }
+    flip_ax_values()
 
     output$plot <- renderPlotly({
       df <- data()
@@ -542,7 +601,7 @@ server <- function(input, output, session) {
     })
   })
 
-  #load plot save
+  #load save
   observeEvent(input$load_state, {
     req(input$load_state)
     reset("file1")
@@ -566,21 +625,13 @@ server <- function(input, output, session) {
         updateCheckboxInput(session, name, value = state$input_values[[name]])
       }
     }
-
-    if (!is.null(state$input_values$flip_x)) {
-      updateCheckboxInput(session, "flip_x", value = state$input_values$flip_x)
-    }
+    valid_labels <- unique(state$data$Gene)
+    selected_labels <- intersect(state$input_values$label, valid_labels)
+    updateSelectInput(session, 'label', choices = valid_labels, selected = selected_labels)
 
     labels$list <- state$labels
     labelsxy$list <- state$labelsxy
-
-    valid_labels <- unique(state$data$Gene)
-    selected_labels <- intersect(state$input_values$label, valid_labels)
-
-    updateSelectizeInput(session, 'label',
-                         choices = valid_labels,
-                         selected = selected_labels,
-                         server = TRUE)
+    flip_ax_values()
 
     output$plot <- renderPlotly({
       df <- data()
@@ -626,11 +677,7 @@ server <- function(input, output, session) {
 
     valid_labels <- unique(df$Gene)
     selected_labels <- intersect(input$label, valid_labels)
-
-    updateSelectizeInput(session, 'label',
-                         choices = valid_labels,
-                         selected = selected_labels,
-                         server = TRUE)
+    updateSelectInput(session, 'label', choices = valid_labels, selected = selected_labels)
 
     if (length(labels$list) > 0) {
       labels$list <- labels$list[sapply(labels$list, function(x) x$name %in% selected_labels)]
