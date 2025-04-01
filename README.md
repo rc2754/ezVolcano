@@ -30,6 +30,8 @@ install.packages(c("shiny", "plotly", "data.table", "dplyr", "shinyjs", "readxl"
 ```
 
 ## Usage
+
+### Data upload format
 Use the `Load data file` button to load your data file. It can be `.txt` `.csv` `.tsv` or `.xslx` (first sheet only).
 
 1. First column must be your gene name or other identifier
@@ -38,6 +40,7 @@ Use the `Load data file` button to load your data file. It can be `.txt` `.csv` 
 
 Additional columns are ignored.
 
+### Saving results
 Use the `Save plot` button to save all of your datapoints, labels, and aesthetic settings. 
 Use the `Save configuration` button to save only your aesthetic settings. 
 These save files can be reloaded for later use.
@@ -45,6 +48,18 @@ These save files can be reloaded for later use.
 Use the camera button on the Plotly toolbar to export as .PNG file.
 
 Example files are available for download in the app.
+
+### Adding data point labels
+There are three ways to add/remove data point labels:
+
+1. Directly clicking on data points
+2. Using the `Select labels` selectInput
+3. Using the `Batch input` button
+
+### Settings for the x-axis
+By default, ezVolcano converts the original fold changes on the x-axis to Z-Scores. This ensures consistent thresholds across different data analysis pipelines, which may report varying fold changes for the same data. However, you can turn off this conversion and switch the x-axis back to the original fold changes.
+
+These two modes each have their own set of threshold values, which do not interconvert. 
 
 ## Credit
 `ezVolcano` was developed by Richard Chen at the Proteomics Core Facility of Brown University.
