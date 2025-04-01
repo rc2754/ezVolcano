@@ -5,7 +5,7 @@ library(dplyr)
 library(shinyjs)
 library(readxl)
 
-options(warn = -1)
+#options(warn = -1)
 
 server <- function(input, output, session) {
   #track filename and if data file or save file was loaded
@@ -208,39 +208,36 @@ server <- function(input, output, session) {
     legend_con_l <- as.character(input$legend_con_l)
     legend_con_r <- as.character(input$legend_con_r)
 
-data$condition <- if (!input$hyperbola) {
-  # Default threshold-based categorization (same as before)
-  factor(
-    ifelse(-log10(data$y) < input$stat_threshold, legend_con_m,
-      ifelse(temp_x < effect_size_left_temp, legend_con_l,
-        ifelse(temp_x > effect_size_right_temp, legend_con_r,
-          legend_con_m
-        )
+	#datapoint color with straight threshold lines
+    data$condition <- if (!input$hyperbola) {
+      factor(
+        ifelse(-log10(data$y) < input$stat_threshold, legend_con_m,
+               ifelse(temp_x < effect_size_left_temp, legend_con_l,
+                      ifelse(temp_x > effect_size_right_temp, legend_con_r,
+                             legend_con_m
+                      )
+               )
+        ),
+        levels = c(legend_con_m, legend_con_l, legend_con_r)
       )
-    ),
-    levels = c(legend_con_m, legend_con_l, legend_con_r)
-  )
-} else {
-  # Hyperbola-based thresholding
-  hyperbola_threshold <- function(x, threshold, curvature, ref_point) {
-    abs(curvature / (x - ref_point)) + threshold
-  }
+    } else {
+      #datapoint color with hyperbolic threshold lines
+      hyperbola_threshold <- function(x, threshold, curvature, ref_point) {
+        abs(curvature / (x - ref_point)) + threshold
+      }
 
-  # Compute threshold for left and right regions
-  y_threshold_left  <- hyperbola_threshold(temp_x, input$stat_threshold, input$curvature, effect_size_left_temp)
-  y_threshold_right <- hyperbola_threshold(temp_x, input$stat_threshold, input$curvature, effect_size_right_temp)
+      y_threshold_left  <- hyperbola_threshold(temp_x, input$stat_threshold, input$curvature, effect_size_left_temp)
+      y_threshold_right <- hyperbola_threshold(temp_x, input$stat_threshold, input$curvature, effect_size_right_temp)
 
-  # Assign colors based on hyperbola condition
-  factor(
-    ifelse(temp_x < effect_size_left_temp & -log10(data$y) > y_threshold_left, legend_con_l,
-      ifelse(temp_x > effect_size_right_temp & -log10(data$y) > y_threshold_right, legend_con_r,
-        legend_con_m
+      factor(
+        ifelse(temp_x < effect_size_left_temp & -log10(data$y) > y_threshold_left, legend_con_l,
+               ifelse(temp_x > effect_size_right_temp & -log10(data$y) > y_threshold_right, legend_con_r,
+                      legend_con_m
+               )
+        ),
+        levels = c(legend_con_m, legend_con_l, legend_con_r)
       )
-    ),
-    levels = c(legend_con_m, legend_con_l, legend_con_r)
-  )
-}
-
+    }
 
     color_mapping <- setNames(c(input$middle_color, input$left_color, input$right_color),
                               c(legend_con_m, legend_con_l, legend_con_r))
@@ -352,32 +349,6 @@ data$condition <- if (!input$hyperbola) {
         )
       )
     }
-if (input$hyperbola) {
-  # Define the hyperbolic functions
-  hyperbola_left <- function(x) abs(input$curvature / (x - effect_size_left_temp)) + input$stat_threshold
-  hyperbola_right <- function(x) abs(input$curvature / (x - effect_size_right_temp)) + input$stat_threshold
-  
-  # Define the x-values for the left and right parts of the hyperbola
-  x_left <- seq(effect_size_left_temp - 0.0000000000000000000001, effect_size_left_temp - 1000, length.out = 500)
-  x_right <- seq(effect_size_right_temp + 0.0000000000000000000001, effect_size_right_temp + 1000, length.out = 500)
-  print(input$effect_size_right_color)
-  
-  # Add lines for the hyperbolic lines
-  p <- p %>% 
-    add_lines(
-      x = x_left,
-      y = hyperbola_left(x_left),
-      line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern),
-      name = "Left Hyperbola"
-    ) %>%
-    add_lines(
-      x = x_right,
-      y = hyperbola_right(x_right),
-      line = list(color = input$effect_size_right_color, width = input$effect_size_right_size, dash = input$effect_size_right_pattern),
-      name = "Right Hyperbola"
-    )
-}
-
 
     #add outline trace for annotation labels
     p <- p %>%
@@ -390,33 +361,65 @@ if (input$hyperbola) {
         inherit = FALSE,
         showlegend = FALSE
       )
+
+	#add hyperbolic threshold lines
+    hyperbola <- create_hyperbola(input, effect_size_left_temp, effect_size_right_temp, xlim)
+    p <- p %>%
+      add_trace(x = hyperbola[[1]]$x, y = hyperbola[[1]]$y, type = "scatter", mode = "lines",
+                line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern), inherit = FALSE, showlegend = FALSE) %>%
+      add_trace(x = hyperbola[[2]]$x, y = hyperbola[[2]]$y, type = "scatter", mode = "lines",
+                line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern), inherit = FALSE, showlegend = FALSE)
+
     event_register(p, "plotly_click")
     return(p)
   }
-  
-#generate lines for plotly
-generate_shapes <- function(input, effect_size_left_temp, effect_size_right_temp) {
- shapes <- list()
-  if (!input$hyperbola) {
-    # Standard threshold-based lines
-    shapes <- list(
-      list(type = "line",
-           x0 = 0, x1 = 1, xref = "paper",
-           y0 = input$stat_threshold, y1 = input$stat_threshold,
-           line = list(color = input$stat_threshold_color, width = input$stat_threshold_size, dash = input$stat_threshold_pattern)),
-      list(type = "line",
-           x0 = effect_size_left_temp, x1 = effect_size_left_temp,
-           y0 = 0, y1 = 1, yref = "paper",
-           line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern)),
-      list(type = "line",
-           x0 = effect_size_right_temp, x1 = effect_size_right_temp,
-           y0 = 0, y1 = 1, yref = "paper",
-           line = list(color = input$effect_size_right_color, width = input$effect_size_right_size, dash = input$effect_size_right_pattern))
-    )
-  }   
-  return(shapes)
-}
 
+  #generate straight threshold lines
+  generate_shapes <- function(input, effect_size_left_temp, effect_size_right_temp) {
+    shapes <- list()
+    if (!input$hyperbola) {
+      # Standard threshold-based lines
+      shapes <- list(
+        list(type = "line",
+             x0 = 0, x1 = 1, xref = "paper",
+             y0 = input$stat_threshold, y1 = input$stat_threshold,
+             line = list(color = input$stat_threshold_color, width = input$stat_threshold_size, dash = input$stat_threshold_pattern)),
+        list(type = "line",
+             x0 = effect_size_left_temp, x1 = effect_size_left_temp,
+             y0 = 0, y1 = 1, yref = "paper",
+             line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern)),
+        list(type = "line",
+             x0 = effect_size_right_temp, x1 = effect_size_right_temp,
+             y0 = 0, y1 = 1, yref = "paper",
+             line = list(color = input$effect_size_right_color, width = input$effect_size_right_size, dash = input$effect_size_right_pattern))
+      )
+    }
+    return(shapes)
+  }
+
+  #generate hyperbolic threshold lines
+  create_hyperbola <- function(input, effect_size_left_temp, effect_size_right_temp, xlim) {
+    if (!input$hyperbola) {
+      return(list(
+        list(x = numeric(0), y = numeric(0)),
+        list(x = numeric(0), y = numeric(0))
+      ))
+    }
+
+    hyperbola_left <- function(x) abs(input$curvature / (x - effect_size_left_temp)) + input$stat_threshold
+    hyperbola_right <- function(x) abs(input$curvature / (x - effect_size_right_temp)) + input$stat_threshold
+
+    x_left <- seq(effect_size_left_temp - 0.001, xlim[1], length.out = 1000)
+    x_right <- seq(effect_size_right_temp + 0.001, xlim[2], length.out = 1000)
+
+    y_left <- hyperbola_left(x_left)
+    y_right <- hyperbola_right(x_right)
+
+    return(list(
+      list(x = x_left, y = y_left),
+      list(x = x_right, y = y_right)
+    ))
+  }
 
 
   #create annotation labels for plotly
@@ -492,7 +495,7 @@ generate_shapes <- function(input, effect_size_left_temp, effect_size_right_temp
     }
   })
 
-  #SelectInput
+  #selectInput
   observeEvent(input$label, {
     currentsel <- input$label
     labelchoices <- unique(data()$Gene)
@@ -579,7 +582,7 @@ generate_shapes <- function(input, effect_size_left_temp, effect_size_right_temp
     req(input$load_config)
     state <- readRDS(input$load_config$datapath)
 
-    if (!is.list(state$input_values) || length(state$input_values) != 107) {
+    if (!is.list(state$input_values) || length(state$input_values) < 100) {
       output$error_message3 <- renderText("Invalid file.")
       return()
     }
