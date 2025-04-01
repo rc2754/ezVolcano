@@ -1,9 +1,5 @@
 # ezVolcano
-Shiny R app for charting interactive volcano plots. Most aesthetic settings are customizable. Click on datapoints to add/remove annotation labels; drag them around to reposition. Additionally, you can add labels with the batch input button or the selectizeInput.
-
-The annotation labels and aesthetic settings can be saved and reloaded for later use.
-
-Use the camera button on the Plotly toolbar to export as .PNG file.
+Shiny R app for charting interactive volcano plots. Most aesthetic settings are customizable. Click on data points to add/remove annotation labels, which can be repositioned by dragging.
 
 Online version is available here: 
 
@@ -43,8 +39,10 @@ Use the `Load data file` button to load your data file. It can be `.txt` `.csv` 
 Additional columns are ignored.
 
 Use the `Save plot` button to save all of your datapoints, labels, and aesthetic settings. 
-
 Use the `Save configuration` button to save only your aesthetic settings. 
+These save files can be reloaded for later use.
+
+Use the camera button on the Plotly toolbar to export as .PNG file.
 
 Example files are available for download in the app.
 
