@@ -7,6 +7,7 @@ library(readxl)
 
 ui <- fluidPage(
   useShinyjs(),
+  tags$style(type="text/css", "#plot.recalculating { opacity: 1.0 !important; }"),
   tags$head(
     tags$meta(name = "ezVolcano", content = "Interactive volcano plot tool"),
     tags$title("ezVolcano")
@@ -54,9 +55,9 @@ ui <- fluidPage(
                    column(6, numericInput("effect_size_right", "Right threshold", value = 1.5, step = 0.1)),
                    column(6, numericInput("effect_size_left_z", "Left threshold (Z-score)", value = -1.96, step = 0.1)),
                    column(6, numericInput("effect_size_right_z", "Right threshold (Z-score)", value = 1.96, step = 0.1)),
-				   
-				   column(6, checkboxInput("hyperbola", "Hyperbolic", TRUE)),
-				   column(6, numericInput("curvature", "Curvature", value = 1, step = 0.1, min = 0.1)),
+
+                   column(6, checkboxInput("hyperbola", "Hyperbolic", TRUE)),
+                   column(6, numericInput("curvature", "Curvature", value = 1, step = 0.1, min = 0.1)),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
 
                    column(6, numericInput("plot_width", "Plot width (px)", value = 1200)),
