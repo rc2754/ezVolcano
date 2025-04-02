@@ -1,7 +1,7 @@
 # ezVolcano
-Shiny R app for charting interactive volcano plots. Most aesthetic settings are customizable. Click on data points to add/remove annotation labels, which can be repositioned by dragging.
+ezVolcano is a user-friendly Shiny R app for creating interactive volcano plots. Designed for data visualization in bioinformatics, this tool allows full customization of aesthetic settings through a graphic user interface. Simply upload your dataset and explore results dynamically. Click on data points to add/remove annotations, and drag labels for precise positioning.
 
-Online version is available here: 
+The online web app is available here: 
 
 ## Table of Contents
 - [Local setup](#local-setup)
