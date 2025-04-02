@@ -208,7 +208,7 @@ server <- function(input, output, session) {
     legend_con_l <- as.character(input$legend_con_l)
     legend_con_r <- as.character(input$legend_con_r)
 
-	#datapoint color with straight threshold lines
+    #datapoint color with straight threshold lines
     data$condition <- if (!input$hyperbola) {
       factor(
         ifelse(-log10(data$y) < input$stat_threshold, legend_con_m,
@@ -362,7 +362,7 @@ server <- function(input, output, session) {
         showlegend = FALSE
       )
 
-	#add hyperbolic threshold lines
+    #add hyperbolic threshold lines
     hyperbola <- create_hyperbola(input, effect_size_left_temp, effect_size_right_temp, xlim)
     p <- p %>%
       add_trace(x = hyperbola[[1]]$x, y = hyperbola[[1]]$y, type = "scatter", mode = "lines",
@@ -530,12 +530,12 @@ server <- function(input, output, session) {
     }
   })
 
-  #output the plotly plot
-  output$plot <- renderPlotly({
-    req(data())
-    df <- data()
-    main_plotly(df)
-  })
+  render_main_plot <- function(data) {
+    renderPlotly({
+      df <- data()
+      main_plotly(df)
+    })
+  }
 
   #save plot
   output$save_state <- downloadHandler(
@@ -598,10 +598,7 @@ server <- function(input, output, session) {
 
     flip_ax_values()
 
-    output$plot <- renderPlotly({
-      df <- data()
-      main_plotly(df)
-    })
+    output$plot <- render_main_plot(data)
   })
 
   #load save
@@ -636,10 +633,7 @@ server <- function(input, output, session) {
     labelsxy$list <- state$labelsxy
     flip_ax_values()
 
-    output$plot <- renderPlotly({
-      df <- data()
-      main_plotly(df)
-    })
+    output$plot <- render_main_plot(data)
   })
 
   #load data file
@@ -706,9 +700,6 @@ server <- function(input, output, session) {
     }
 
     data(df)
-    output$plot <- renderPlotly({
-      df <- data()
-      main_plotly(df)
-    })
+    output$plot <- render_main_plot(data)
   })
 }
