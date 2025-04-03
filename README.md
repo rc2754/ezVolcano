@@ -64,7 +64,7 @@ These two modes each have their own set of threshold values, which do not interc
 ## Credit
 `ezVolcano` was developed by Richard Chen at the Proteomics Core Facility of Brown University.
 
-`ezVolcano` uses source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
+`ezVolcano` adapted source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
 
 ## Contact
 Open an issue on Github or email `richard_chen1@brown.edu` with any questions.
