@@ -55,7 +55,7 @@ There are three ways to add/remove data point labels:
 3. Using the `Batch input` button (space or comma delimited)
 
 ### Settings for the x-axis
-By default, ezVolcano converts the original fold changes on the x-axis to Z-scores. This ensures consistent thresholds across different data analysis pipelines, which may report varying fold changes for the same data. However, you can turn off this conversion and switch the x-axis back to the original fold changes.
+By default, ezVolcano converts the original fold changes on the x-axis to Z-scores. This ensures consistent thresholds across different data analysis pipelines and experimental conditions.
 
 These two modes each have their own set of threshold values, which do not interconvert. 
 
