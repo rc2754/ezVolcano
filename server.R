@@ -530,6 +530,7 @@ server <- function(input, output, session) {
     }
   })
 
+  #function to render the main plot
   render_main_plot <- function(data) {
     renderPlotly({
       df <- data()
