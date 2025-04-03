@@ -546,7 +546,7 @@ server <- function(input, output, session) {
       } else if (is_save() == 1) {
         file_name <- tools::file_path_sans_ext(basename(input$file1$name))
       }
-      paste0(input$prefix, file_name, input$suffix, ".rds")
+      paste0(input$prefix, file_name, input$suffix, "_savestate.rds")
     },
     content = function(file) {
       saveRDS(
