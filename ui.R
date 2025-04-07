@@ -98,10 +98,10 @@ ui <- fluidPage(
 
 
                    column(12, numericInput("zero_pad", "Zeroline padding", value = 0.5, step = 0.05)),
-                   column(6, numericInput("xlim1", "x-axis limit 1", value = NA, step = 0.5)),
-                   column(6, numericInput("xlim2", "x-axis limit 2", value = NA, step = 0.5)),
-                   column(6, numericInput("ylim1", "y-axis limit 1", value = NA, step = 0.5)),
-                   column(6, numericInput("ylim2", "y-axis limit 2", value = NA, step = 0.5)),
+                   column(6, numericInput("xlim1", "x-axis limit left", value = NA, step = 0.5)),
+                   column(6, numericInput("xlim2", "x-axis limit right", value = NA, step = 0.5)),
+                   column(6, numericInput("ylim1", "y-axis limit left", value = NA, step = 0.5)),
+                   column(6, numericInput("ylim2", "y-axis limit right", value = NA, step = 0.5)),
                    column(6, numericInput("xlim_pad", "x-range padding", value = 1.1, step = 0.1)),
                    column(6, numericInput("ylim_pad", "y-range padding", value = 1.1, step = 0.1)),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
