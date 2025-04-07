@@ -123,6 +123,7 @@ ui <- fluidPage(
                    column(12, textInput("stat_threshold_pattern", "Stat threshold line pattern", value = "dash")),
                    column(6, textInput("effect_size_left_pattern", "Left threshold line pattern", value = "dash")),
                    column(6, textInput("effect_size_right_pattern", "Right threshold line pattern", value = "dash")),
+                   column(12, textInput("hyperbola_pattern", "Hyperbolic line pattern", value = "dash")),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
 
                    column(12, numericInput("title_size", "Title Size", value = 24)),
@@ -248,11 +249,10 @@ ui <- fluidPage(
                br(),
                h4("Examples"),
 
-               tags$ul(
-                 tags$li(downloadButton("example_data", "Example data file")),
-                 tags$li(downloadButton("example_save", "Example save file")),
-                 tags$li(downloadButton("example_config", "Example config file"))
-               )
+               downloadButton("example_data", "Example data file"),
+               downloadButton("example_save", "Example save file"),
+               downloadButton("example_config", "Example config file"),
+               downloadButton("param_description", "Description of all plot parameters")
              )
     ),
 
