@@ -37,6 +37,14 @@ server <- function(input, output, session) {
       file.copy("examples/example_config.rds", file)}
   )
 
+  output$param_description <- downloadHandler(
+    filename = function() {
+      "PlotSettingsDescription.xlsx"
+    },
+    content = function(file) {
+      file.copy("examples/PlotSettingsDescription.xlsx", file)}
+  )
+
   #Reactive values
   data <- reactiveVal()
   labels <- reactiveValues(list = list())
@@ -366,9 +374,9 @@ server <- function(input, output, session) {
     hyperbola <- create_hyperbola(input, effect_size_left_temp, effect_size_right_temp, xlim)
     p <- p %>%
       add_trace(x = hyperbola[[1]]$x, y = hyperbola[[1]]$y, type = "scatter", mode = "lines",
-                line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern), inherit = FALSE, showlegend = FALSE) %>%
+                line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$hyperbola_pattern), inherit = FALSE, showlegend = FALSE) %>%
       add_trace(x = hyperbola[[2]]$x, y = hyperbola[[2]]$y, type = "scatter", mode = "lines",
-                line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$effect_size_left_pattern), inherit = FALSE, showlegend = FALSE)
+                line = list(color = input$effect_size_left_color, width = input$effect_size_left_size, dash = input$hyperbola_pattern), inherit = FALSE, showlegend = FALSE)
 
     event_register(p, "plotly_click")
     return(p)
