@@ -96,7 +96,6 @@ ui <- fluidPage(
                    column(6, numericInput("label4_padding_y", "Label 4 padding_y", value = 0.001, max = 1, step = 0.001)),
                    column(12, tags$hr(style = "border-top: 2px solid black;")),
 
-
                    column(12, numericInput("zero_pad", "Zeroline padding", value = 0.5, step = 0.05)),
                    column(6, numericInput("xlim1", "x-axis limit left", value = NA, step = 0.5)),
                    column(6, numericInput("xlim2", "x-axis limit right", value = NA, step = 0.5)),
@@ -115,10 +114,12 @@ ui <- fluidPage(
                    column(12, textInput("stat_threshold_color", "Stat threshold line color", value = "gray")),
                    column(6, textInput("effect_size_left_color", "Left threshold line color", value = "gray")),
                    column(6, textInput("effect_size_right_color", "Right threshold line color", value = "gray")),
+				   column(12, textInput("hyperbola_color", "Hyperbolic line color", value = "gray")),
 
                    column(12, numericInput("stat_threshold_size", "Stat threshold line width", value = 1)),
                    column(6, numericInput("effect_size_left_size", "Left threshold line width", value = 1)),
                    column(6, numericInput("effect_size_right_size", "Right threshold line width", value = 1)),
+				   column(12, numericInput("hyperbola_size", "Hyperbolic line width", value = 1)),
 
                    column(12, textInput("stat_threshold_pattern", "Stat threshold line pattern", value = "dash")),
                    column(6, textInput("effect_size_left_pattern", "Left threshold line pattern", value = "dash")),
