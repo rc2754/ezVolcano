@@ -365,7 +365,7 @@ server <- function(input, output, session) {
         y = unlist(lapply(labels$list, `[[`, "y")),
         type = 'scatter',
         mode = 'markers',
-        marker = list(size = input$point_size,  color = 'rgba(0,0,0,0)', line = list(width = input$label_point_outline_width, color = input$label_point_outline_color)),
+        marker = list(size = input$point_size,  symbol = input$point_shape, color = 'rgba(0,0,0,0)', line = list(width = input$label_point_outline_width, color = input$label_point_outline_color)),
         inherit = FALSE,
         showlegend = FALSE
       )
