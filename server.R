@@ -667,8 +667,7 @@ server <- function(input, output, session) {
     }
 
     colnames(df)[c(1, 2, 3)] <- c("Gene", "x", "y")
-	df$Gene <- make.unique(as.character(df$Gene), sep = "(")
-	df$Gene <- sub("(\\d+)$", "\\1)", df$Gene)
+	df$Gene <- make.unique(as.character(df$Gene), sep = "_")
 	
 
     if (!is.numeric(df$x) || !is.numeric(df$y)) {
