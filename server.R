@@ -667,6 +667,9 @@ server <- function(input, output, session) {
     }
 
     colnames(df)[c(1, 2, 3)] <- c("Gene", "x", "y")
+	df$Gene <- make.unique(as.character(df$Gene), sep = "(")
+	df$Gene <- sub("(\\d+)$", "\\1)", df$Gene)
+	
 
     if (!is.numeric(df$x) || !is.numeric(df$y)) {
       output$error_message1 <- renderText("Columns 'x' and 'y' must be numeric.")
