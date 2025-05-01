@@ -261,11 +261,11 @@ ui <- fluidPage(
     tabPanel("Credits",
              fluidPage(
                h3("About ezVolcano"),
-               p("The ezVolcano Shiny R app is a tool for charting volcano plots. You can click on datapoints to add labels and drag these labels around."),
+               p("ezVolcano is a Shiny R app tool for charting volcano plots. Aesthetics are highly customizable; click on datapoints to add labels and drag these labels around."),
 
                br(),
                h4("Contact"),
-               p("ezVolcano is created and maintained by Richard Chen. For bug reports and feature requests, feel free to contact through:"),
+               p("Created and maintained by Richard Chen. For questions and bug reports:"),
 
                tags$ul(
                  tags$li(a(href = "https://github.com/chenr47/ezVolcano/issues", "https://github.com/chenr47/ezVolcano/issues")),
@@ -274,14 +274,14 @@ ui <- fluidPage(
 
                br(),
                h4("Source"),
-               p("Source code is available at: ",
+               p("Source code: ",
                  a(href = "https://github.com/chenr47/ezVolcano", "https://github.com/chenr47/ezVolcano")
                ),
                p("ezVolcano is easy to set up locally (see the GitHub tutorial)."),
 
                br(),
                h4("Acknowledgement"),
-               p("To enable interactive labels, some source code from the easylabel R package by Myles Lewis was used (https://github.com/myles-lewis/easylabel).")
+               p("To enable interactive labels, source code was adapted from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel).")
              )
     )
   )
