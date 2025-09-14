@@ -60,12 +60,12 @@ By default, ezVolcano converts the original fold changes on the x-axis to Z-scor
 The threshold values for original fold changes and Z-scores do not interconvert and are set separately.
 
 ## Credit
-`ezVolcano` was developed by Richard Chen at the Proteomics Core Facility of Brown University.
+`ezVolcano` was developed by Richard Chen.
 
 `ezVolcano` adapted source code from the `easylabel` R package by Myles Lewis (https://github.com/myles-lewis/easylabel) for interactive labels.
 
 ## Contact
-Open an issue on Github or email `richard_chen1@brown.edu` with any questions.
+Open an issue on Github.
 
 ## License
 `The MIT License (MIT)`
