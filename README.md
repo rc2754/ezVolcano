@@ -6,7 +6,7 @@ The online web app is available here:
 ## Table of Contents
 - [Local setup](#local-setup)
 - [Usage](#usage)
-- [Authors](#authors)
+- [Credit](#credit)
 - [Contact](#contact)
 - [License](#license)
 
