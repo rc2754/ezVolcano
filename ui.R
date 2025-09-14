@@ -268,8 +268,7 @@ ui <- fluidPage(
                p("Created and maintained by Richard Chen. For questions and bug reports:"),
 
                tags$ul(
-                 tags$li(a(href = "https://github.com/chenr47/ezVolcano/issues", "https://github.com/chenr47/ezVolcano/issues")),
-                 tags$li("richard_chen1@brown.edu")
+                 tags$li(a(href = "https://github.com/chenr47/ezVolcano/issues", "https://github.com/chenr47/ezVolcano/issues"))
                ),
 
                br(),
@@ -286,3 +285,4 @@ ui <- fluidPage(
     )
   )
 )
+
