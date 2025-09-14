@@ -258,33 +258,42 @@ ui <- fluidPage(
     ),
 
 
-    tabPanel("Credits",
-             fluidPage(
-               h3("About ezVolcano"),
-               p("ezVolcano is a Shiny R app tool for charting volcano plots. Aesthetics are highly customizable; click on datapoints to add labels and drag these labels around."),
-
-               br(),
-               h4("Contact"),
-               p("Created and maintained by Richard Chen. For questions and bug reports: "),
-
-               tags$ul(
-                 a(href = "https://github.com/rc2754/ezVolcano/issues", "https://github.com/rc2754/ezVolcano/issues")
-               ),
-
-               br(),
-               h4("Source"),
-               p("Source code: ",
-                 a(href = "https://github.com/rc2754/ezVolcano", "https://github.com/rc2754/ezVolcano")
-               ),
-               p("ezVolcano is easy to set up locally (see the GitHub tutorial)."),
-
-               br(),
-               h4("Acknowledgement"),
-               p("To enable interactive labels, source code was adapted from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel).")
-             )
+    tabPanel(
+      "Credits",
+      fluidPage(
+        h3("About ezVolcano"),
+        p(
+          "ezVolcano is a Shiny R app tool for charting volcano plots. Aesthetics are highly customizable; click on datapoints to add labels and drag these labels around."
+        ),
+        
+        br(),
+        h4("Contact"),
+        p(
+          "Created and maintained by Richard Chen.",
+          tags$br(),
+          "For questions and bug reports: ",
+          a(href = "https://github.com/rc2754/ezVolcano/issues", "https://github.com/rc2754/ezVolcano/issues")
+        ),
+        
+        br(),
+        h4("Source"),
+        p(
+          "Source code: ",
+          a(href = "https://github.com/rc2754/ezVolcano", "https://github.com/rc2754/ezVolcano"),
+          tags$br(),
+          "ezVolcano is easy to set up locally (see the GitHub tutorial)."
+        ),
+        
+        br(),
+        h4("Acknowledgement"),
+        p(
+          "To enable interactive labels, source code was adapted from the easylabel R package by Myles Lewis (https://github.com/myles-lewis/easylabel)."
+        )
+      )
     )
   )
 )
+
 
 
 
