@@ -268,13 +268,13 @@ ui <- fluidPage(
                p("Created and maintained by Richard Chen. For questions and bug reports:"),
 
                tags$ul(
-                 tags$li(a(href = "https://github.com/chenr47/ezVolcano/issues", "https://github.com/chenr47/ezVolcano/issues"))
+                 tags$li(a(href = "https://github.com/rc2754/ezVolcano/issues", "https://github.com/rc2754/ezVolcano/issues"))
                ),
 
                br(),
                h4("Source"),
                p("Source code: ",
-                 a(href = "https://github.com/chenr47/ezVolcano", "https://github.com/chenr47/ezVolcano")
+                 a(href = "https://github.com/rc2754/ezVolcano", "https://github.com/rc2754/ezVolcano")
                ),
                p("ezVolcano is easy to set up locally (see the GitHub tutorial)."),
 
@@ -285,4 +285,5 @@ ui <- fluidPage(
     )
   )
 )
+
 
